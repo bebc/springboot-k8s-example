@@ -18,10 +18,25 @@ podTemplate(label: 'mypod', cloud: 'kubernetes', containers: [
         ]) {
 
     node('mypod') {
+
+        def gitCommit
+        def shortGitCommit
+        def previousGitCommit
+
         container('maven') {
 
             stage('checkout') {
                 checkout scm
+
+                sh 'printenv'
+
+                gitCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                shortGitCommit = "${gitCommit[0..10]}"
+                previousGitCommit = sh(script: "git rev-parse ${gitCommit}~", returnStdout: true)
+
+                echo "gitCommit = ${gitCommit}"
+                echo "shortGitCommit = ${shortGitCommit}"
+                echo "previousGitCommit = ${previousGitCommit}"
             }
 
             stage('pacakge') {
@@ -32,15 +47,16 @@ podTemplate(label: 'mypod', cloud: 'kubernetes', containers: [
             container('docker') {
 
                 stage('docker-login') {
-                    sh "docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}"
+                    //REGISTRY_URL私有仓库地址，也可使用官方地址：docker.io
+                    sh "docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD} ${REGISTRY_URL}"
                 }
 
                 stage('docker-build') {
-                    sh "docker build . -t lusyoe/k8s-example:latest"
+                    sh "docker build . -t ${REGISTRY_URL}/lusyoe/k8s-example:${shortGitCommit}"
                 }
 
                 stage('docker-push') {
-                    sh 'docker push lusyoe/k8s-example:latest'
+                    sh "docker push ${REGISTRY_URL}/lusyoe/k8s-example:${shortGitCommit}"
                 }
             }
 
@@ -48,6 +64,8 @@ podTemplate(label: 'mypod', cloud: 'kubernetes', containers: [
 
         stage('k8s deploy') {
             container('kubectl') {
+                sh "sed -i \"s/lusyoe\\/k8s-example/${REGISTRY_URL}\\/lusyoe\\/k8s-example:${shortGitCommit}/g\" k8s-example.yaml"
+
                 sh "kubectl --kubeconfig=/root/.kube/config apply -f k8s-example.yaml"
             }
         }
