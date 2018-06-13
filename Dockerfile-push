@@ -1,9 +1,0 @@
-FROM java
-
-LABEL maintainer "lusyoe"
-
-COPY /project/target/k8s-example.jar /usr/src/myapp/k8s-example.jar
-
-WORKDIR /usr/src/myapp/
-
-ENTRYPOINT java -jar k8s-example.jar
