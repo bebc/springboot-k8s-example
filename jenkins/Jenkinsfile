@@ -13,14 +13,12 @@ properties(projectProperties)
 
 
 podTemplate(label: 'mypod', cloud: 'kubernetes', containers: [
-        containerTemplate(name: 'maven', image: 'maven', command: 'cat', ttyEnabled: true),
-        containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
-        containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.10.2', command: 'cat', ttyEnabled: true)
-],
-        volumes: [
-                hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-                hostPathVolume(hostPath: '/root/.kube', mountPath: '/root/.kube')
-        ]) {
+            containerTemplate(name: 'maven', image: 'maven', command: 'cat', ttyEnabled: true),
+            containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+            containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.10.2', command: 'cat', ttyEnabled: true) ],
+            volumes: [
+                    hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+                    hostPathVolume(hostPath: '/root/.kube', mountPath: '/root/.kube')]) {
 
     node('mypod') {
 
@@ -46,31 +44,30 @@ podTemplate(label: 'mypod', cloud: 'kubernetes', containers: [
 
             stage('pacakge') {
 
-                sh 'mvn package -Dmaven.test.skip=true'
+                sh 'mvn clean package -Dmaven.test.skip=true'
             }
-
-            container('docker') {
-
-                stage('docker-login') {
-                    //REGISTRY_URL私有仓库地址，也可使用官方地址：docker.io
-                    sh "docker login -u ${params.DOCKER_USER} -p ${params.DOCKER_PASSWORD} ${params.REGISTRY_URL}"
-                }
-
-                stage('docker-build') {
-                    sh "docker build . -t ${params.REGISTRY_URL}/lusyoe/k8s-example:${shortGitCommit}"
-                }
-
-                stage('docker-push') {
-                    sh "docker push ${params.REGISTRY_URL}/lusyoe/k8s-example:${shortGitCommit}"
-                }
-            }
-
         }
 
-        stage('k8s deploy') {
-            container('kubectl') {
-                sh "sed -i \"s/lusyoe\\/k8s-example/${params.REGISTRY_URL}\\/lusyoe\\/k8s-example:${shortGitCommit}/g\" k8s-example.yaml"
+        container('docker') {
 
+            stage('docker-login') {
+                //REGISTRY_URL私有仓库地址，也可使用官方地址：docker.io
+                sh "docker login -u ${params.DOCKER_USER} -p ${params.DOCKER_PASSWORD} ${params.REGISTRY_URL}"
+            }
+
+            stage('docker-build') {
+                sh "docker build . -t ${params.REGISTRY_URL}/lusyoe/k8s-example:${shortGitCommit}"
+            }
+
+            stage('docker-push') {
+                sh "docker push ${params.REGISTRY_URL}/lusyoe/k8s-example:${shortGitCommit}"
+            }
+        }
+
+
+        container('kubectl') {
+            stage('k8s deploy') {
+                sh "sed -i \"s/lusyoe\\/k8s-example/${params.REGISTRY_URL}\\/lusyoe\\/k8s-example:${shortGitCommit}/g\" k8s-example.yaml"
                 sh "kubectl --kubeconfig=/root/.kube/config apply -f k8s-example.yaml"
             }
         }
