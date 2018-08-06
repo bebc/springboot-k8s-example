@@ -11,8 +11,9 @@ def projectProperties = [
 
 properties(projectProperties)
 
+def label = "mypod-${UUID.randomUUID().toString()}"
 
-podTemplate(label: 'mypod', cloud: 'kubernetes', containers: [
+podTemplate(label: label, cloud: 'kubernetes', containers: [
             containerTemplate(name: 'maven', image: 'maven', command: 'cat', ttyEnabled: true),
             containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
             containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.10.2', command: 'cat', ttyEnabled: true) ],
@@ -20,7 +21,7 @@ podTemplate(label: 'mypod', cloud: 'kubernetes', containers: [
                     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
                     hostPathVolume(hostPath: '/root/.kube', mountPath: '/root/.kube')]) {
 
-    node('mypod') {
+    node(label) {
 
         def gitCommit
         def shortGitCommit
