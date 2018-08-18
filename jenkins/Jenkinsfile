@@ -19,7 +19,9 @@ podTemplate(label: label, cloud: 'kubernetes', containers: [
             containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.10.2', command: 'cat', ttyEnabled: true) ],
             volumes: [
                     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
-                    hostPathVolume(hostPath: '/root/.kube', mountPath: '/root/.kube')]) {
+                    hostPathVolume(hostPath: '/root/.kube', mountPath: '/root/.kube'),
+                    hostPathVolume(hostPath: '/root/.m2', mountPath: '/root/.m2')
+                    ]) {
 
     node(label) {
 
@@ -45,7 +47,7 @@ podTemplate(label: label, cloud: 'kubernetes', containers: [
 
             stage('pacakge') {
 
-                sh 'mvn clean package -Dmaven.test.skip=true'
+                sh 'mvn clean package -Dmaven.test.skip=true -s ./settings.xml'
             }
         }
 
