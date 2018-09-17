@@ -9,7 +9,7 @@
   //      ])
 //]
 
-properties(projectProperties)
+//properties(projectProperties)
 
 def label = "mypod-${UUID.randomUUID().toString()}"
 
