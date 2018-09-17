@@ -1,13 +1,13 @@
 #!/usr/bin/env groovy
 
-def projectProperties = [
-        [$class: 'BuildDiscarderProperty', strategy: [$class: 'LogRotator', numToKeepStr: '5']],
-        parameters([
-            string(name: 'DOCKER_USER', defaultValue: '', description: 'docker用户名'),
-            string(name: 'DOCKER_PASSWORD', defaultValue: '', description: 'docker用户密码'),
-            string(name: 'REGISTRY_URL', defaultValue: 'docker.io', description: 'docker仓库地址')
-        ])
-]
+//def projectProperties = [
+ //       [$class: 'BuildDiscarderProperty', strategy: [$class: 'LogRotator', numToKeepStr: '5']],
+ //       parameters([
+  //          string(name: 'DOCKER_USER', defaultValue: '', description: 'docker用户名'),
+  //          string(name: 'DOCKER_PASSWORD', defaultValue: '', description: 'docker用户密码'),
+  //          string(name: 'REGISTRY_URL', defaultValue: 'docker.io', description: 'docker仓库地址')
+  //      ])
+//]
 
 properties(projectProperties)
 
