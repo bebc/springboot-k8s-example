@@ -70,7 +70,7 @@ podTemplate(label: label, cloud: 'kubernetes', containers: [
 
         container('jnlp') {
             stage('k8s deploy') {
-                sh "sed -i 's/lusyoe\/k8s-example/ic-harbor.baozun.com\/sit\/k8s-example:${shortGitCommit}/g' k8s-example.yaml"
+                sh "sed -i 's/lusyoe\\/k8s-example/ic-harbor.baozun.com\\/sit\\/k8s-example:${shortGitCommit}/g' k8s-example.yaml"
                 sh "kubectl --kubeconfig=/root/.kube/config apply -f k8s-example.yaml"
             }
         }
