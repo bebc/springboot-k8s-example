@@ -54,7 +54,7 @@ podTemplate(label: label, cloud: 'kubernetes', containers: [
         container('jnlp') {
 
             stage('docker-login') {
-                REGISTRY_URL私有仓库地址，也可使用官方地址：docker.io
+                //REGISTRY_URL私有仓库地址，也可使用官方地址：docker.io
                 sh "docker login -u ${params.DOCKER_USER} -p ${params.DOCKER_PASSWORD} ${params.REGISTRY_URL}"
             }
 
