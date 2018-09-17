@@ -1,13 +1,13 @@
 #!/usr/bin/env groovy
 
-//def projectProperties = [
- //       [$class: 'BuildDiscarderProperty', strategy: [$class: 'LogRotator', numToKeepStr: '5']],
- //       parameters([
-  //          string(name: 'DOCKER_USER', defaultValue: '', description: 'docker用户名'),
-  //          string(name: 'DOCKER_PASSWORD', defaultValue: '', description: 'docker用户密码'),
-  //          string(name: 'REGISTRY_URL', defaultValue: 'docker.io', description: 'docker仓库地址')
-  //      ])
-//]
+def projectProperties = [
+        [$class: 'BuildDiscarderProperty', strategy: [$class: 'LogRotator', numToKeepStr: '5']],
+        parameters([
+            string(name: 'DOCKER_USER', defaultValue: '', description: 'docker用户名'),
+            string(name: 'DOCKER_PASSWORD', defaultValue: '', description: 'docker用户密码'),
+            string(name: 'REGISTRY_URL', defaultValue: 'docker.io', description: 'docker仓库地址')
+        ])
+]
 
 //properties(projectProperties)
 
@@ -53,10 +53,10 @@ podTemplate(label: label, cloud: 'kubernetes', containers: [
 
         container('jnlp') {
 
-            //stage('docker-login') {
-                //REGISTRY_URL私有仓库地址，也可使用官方地址：docker.io
-            //    sh "docker login -u ${params.DOCKER_USER} -p ${params.DOCKER_PASSWORD} ${params.REGISTRY_URL}"
-            //}
+            stage('docker-login') {
+                REGISTRY_URL私有仓库地址，也可使用官方地址：docker.io
+                sh "docker login -u ${params.DOCKER_USER} -p ${params.DOCKER_PASSWORD} ${params.REGISTRY_URL}"
+            }
 
             stage('docker-build') {
                 sh "docker build . -t ic-harbor.baozun.com/sit/k8s-example:${shortGitCommit}"
