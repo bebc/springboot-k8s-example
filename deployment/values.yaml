@@ -4,6 +4,8 @@
 
 replicaCount: 1
 
+clustername: test
+
 image:
   repository: nginx
   pullPolicy: IfNotPresent
